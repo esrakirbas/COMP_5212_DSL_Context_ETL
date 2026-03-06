@@ -1,0 +1,5 @@
+package etl.model
+
+data class EtlJob(
+    val sources: List<Source>
+)
