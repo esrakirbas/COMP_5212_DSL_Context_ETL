@@ -5,6 +5,7 @@ import etl.model.ExcelSource
 import etl.model.JsonSource
 import etl.model.Source
 
+/** Extract tag . Extract from multiple Sources csv. json and excel **/
 @EtlDslMarker
 class ExtractBuilder {
     private val sources = mutableListOf<Source>()

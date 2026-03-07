@@ -1,5 +1,6 @@
 package etl.model
 
 data class EtlJob(
-    val sources: List<Source>
+    val sources: List<Source>,
+    val schema: Schema
 )
