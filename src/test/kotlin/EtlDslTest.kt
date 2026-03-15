@@ -11,7 +11,10 @@ class EtlAndExtractDslTest {
     fun `should have single source`() {
         val job = etl {
             extract { csv("data.csv") }
-            schema {field("fieldName") {}}
+            schema {field("fieldName") {} }
+            transform {  }
+            load { csv("filename") {}
+            }
         }
         assertEquals(1, job.sources.size)
     }
@@ -21,6 +24,8 @@ class EtlAndExtractDslTest {
         val job = etl {
             extract { csv("data.csv") }
             schema {field("fieldName") {}}
+            transform {  }
+            load { csv("filename") {} }
         }
         val firstSource = job.sources.first()
         assert(firstSource is CsvSource)
@@ -35,6 +40,8 @@ class EtlAndExtractDslTest {
                 excel("data_excel.csv")
             }
             schema {field("fieldName") {}}
+            transform {  }
+            load { csv("filename") {} }
         }
         assertEquals(3, job.sources.size)
         val firstSource = job.sources.first()
@@ -50,6 +57,8 @@ class EtlAndExtractDslTest {
         val job = etl {
             extract { json("data_json.json") }
             schema {field("fieldName") {}}
+            transform {  }
+            load { csv("filename") {} }
         }
         val firstSource = job.sources.first()
         assertIs<JsonSource>(firstSource)
@@ -61,6 +70,8 @@ class EtlAndExtractDslTest {
         val job = etl {
             extract { csv("data.csv") }
             schema {field("fieldName") {}}
+            transform {  }
+            load { csv("filename") {} }
         }
         val source = job.sources.first()
         assertIs<CsvSource>(source)
@@ -72,6 +83,8 @@ class EtlAndExtractDslTest {
         val job = etl {
             extract { excel("data_xsl.xsl") }
             schema {field("fieldName") {}}
+            transform {  }
+            load { csv("filename") {} }
         }
         val source = job.sources.first()
         assertIs<ExcelSource>(source)

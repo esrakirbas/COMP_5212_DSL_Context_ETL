@@ -15,6 +15,8 @@ class SchemaDslTest {
                     notEmpty()
                 }
             }
+            transform {  }
+            load { csv("filename") {} }
         }
         val schema = job.schema
         assertEquals(1, schema.fields.size)
@@ -32,6 +34,8 @@ class SchemaDslTest {
                     rejectIfInvalid()
                 }
             }
+            transform {  }
+            load { csv("filename") {} }
         }
         val field = job.schema.fields.first()
         assertEquals(3, field.rules.size)
@@ -48,6 +52,8 @@ class SchemaDslTest {
                     minLength(1)
                 }
             }
+            transform {  }
+            load { csv("filename") {} }
         }
         val maxLengthRule = job.schema.fields.first().rules.get(1) //maxLength rule
         if (maxLengthRule is MaxLength) {
@@ -70,6 +76,8 @@ class SchemaDslTest {
                         notEmpty()
                     }
                 }
+                transform {  }
+                load { csv("filename") {} }
             }
         }
     }
@@ -83,6 +91,8 @@ class SchemaDslTest {
                 }
                 schema {
                 }
+                transform {  }
+                load { csv("filename") {} }
             }
         }
     }
@@ -94,6 +104,8 @@ class SchemaDslTest {
                 extract {
                     csv("data.csv")
                 }
+                transform {  }
+                load { csv("filename") {} }
             }
         }
     }
