@@ -1,29 +1,30 @@
 package etl.main
 
 import etl.core.dsl.etl
+import etl.core.engine.EtlRunner
 
 fun main() {
-    val etlJob = etl {
+    val job = etl {
+        log("etl.log")
+
         extract {
-            csv("orders.csv")
-            json("orders_from_BC.csv")
+            csv("people.csv")
         }
+
         schema {
-            field("orderId") {}
-            field("orderDate") {}
-            field("customerName") {}
-            field("orderedItem") {}
-            field("orderedItemCount") {}
-            field("price") {}
-            field("deliveryAddress") {}
+            field("name") {
+                notEmpty()
+            }
+            field(name = "city") {
+                notEmpty()
+                rejectIfInvalid()
+            }
         }
-        transform {
-            filter { empty("orderId") }
-            filter { empty("customerName") }
-            clean { toTitleCase("customerName") }
-            clean { trim("price") }
+
+        load {
+            csv("output.csv") {}
         }
-        load { csv("orders_unified.csv") { overwrite() } }
     }
-    //EtlRunner().run(etlJob)
+
+    EtlRunner().run(job)
 }

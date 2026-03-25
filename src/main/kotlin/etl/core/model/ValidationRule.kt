@@ -8,8 +8,8 @@ sealed interface ValidationRule
 
 //stateless rules ar defined as singleton
 object NotEmpty : ValidationRule
-object RejectIfInvalid : ValidationRule
 object IsNumber : ValidationRule
+object RejectIfInvalid : ValidationRule
 
 //parametrized rules defined as data classes
 data class MinLength(val length: Int) : ValidationRule
