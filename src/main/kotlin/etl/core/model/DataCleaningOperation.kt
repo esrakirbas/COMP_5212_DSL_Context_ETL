@@ -1,4 +1,4 @@
-package etl.model
+package etl.core.model
 
 /**
  * Different types of data cleaning operations under clean block
@@ -10,5 +10,5 @@ sealed interface DataCleaningOperation {
     data class ToTitleCase(val field: String) : DataCleaningOperation
     data class ToLowerCase(val field: String) : DataCleaningOperation
     data class DefaultIfEmpty(val field: String, val defaultValue: String) : DataCleaningOperation
-    data class ReplaceWith(val field: String, val value: String, val replaceWith: String) : DataCleaningOperation
+    data class Replace(val field: String, val value: String, val replace: String) : DataCleaningOperation
 }

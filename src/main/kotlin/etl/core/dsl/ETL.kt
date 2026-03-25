@@ -1,6 +1,6 @@
-package etl.dsl
+package etl.core.dsl
 
-import etl.model.EtlJob
+import etl.core.model.EtlJob
 
 /**
  * ETL entry point

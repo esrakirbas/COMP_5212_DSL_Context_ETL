@@ -1,6 +1,5 @@
-import etl.dsl.DslException
-import etl.dsl.etl
-import etl.model.MaxLength
+import etl.core.dsl.etl
+import etl.core.model.MaxLength
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -8,15 +7,15 @@ import kotlin.test.assertFailsWith
 class SchemaDslTest {
     @Test
     fun `should create schema with one field`() {
-        val job = etl {
+        val job =  etl {
             extract { csv("data.csv") }
             schema {
                 field("fieldName") {
                     notEmpty()
                 }
             }
-            transform {  }
-            load { csv("filename") {} }
+            transform { }
+            load { csv("filename.csv") {} }
         }
         val schema = job.schema
         assertEquals(1, schema.fields.size)
@@ -25,7 +24,7 @@ class SchemaDslTest {
 
     @Test
     fun `should assign validation rules to field`() {
-        val job = etl {
+        val job =  etl {
             extract { csv("data.csv") }
             schema {
                 field("fieldName") {
@@ -34,8 +33,8 @@ class SchemaDslTest {
                     rejectIfInvalid()
                 }
             }
-            transform {  }
-            load { csv("filename") {} }
+            transform { }
+            load { csv("filename.csv") {} }
         }
         val field = job.schema.fields.first()
         assertEquals(3, field.rules.size)
@@ -43,7 +42,7 @@ class SchemaDslTest {
 
     @Test
     fun `should capture parametrized validation rules`() {
-        val job = etl {
+        val job =  etl {
             extract { csv("data.csv") }
             schema {
                 field("fieldName") {
@@ -52,8 +51,8 @@ class SchemaDslTest {
                     minLength(1)
                 }
             }
-            transform {  }
-            load { csv("filename") {} }
+            transform { }
+            load { csv("filename.csv") {} }
         }
         val maxLengthRule = job.schema.fields.first().rules.get(1) //maxLength rule
         if (maxLengthRule is MaxLength) {
@@ -64,7 +63,7 @@ class SchemaDslTest {
     @Test
     fun `should fail in case of duplicate rules defined`() {
         assertFailsWith<IllegalStateException> {
-            etl {
+             etl {
                 extract {
                     csv("data.csv")
                 }
@@ -76,8 +75,8 @@ class SchemaDslTest {
                         notEmpty()
                     }
                 }
-                transform {  }
-                load { csv("filename") {} }
+                transform { }
+                load { csv("filename.csv") {} }
             }
         }
     }
@@ -85,27 +84,27 @@ class SchemaDslTest {
     @Test
     fun `should fail if no fields defined in schema`() {
         assertFailsWith<IllegalStateException> {
-            etl {
+             etl {
                 extract {
                     csv("data.csv")
                 }
                 schema {
                 }
-                transform {  }
-                load { csv("filename") {} }
+                transform { }
+                load { csv("filename.csv") {} }
             }
         }
     }
 
     @Test
     fun `should fail if no schema definition`() {
-        assertFailsWith<DslException> {
-            etl {
+        assertFailsWith<etl.core.dsl.DslException> {
+             etl {
                 extract {
                     csv("data.csv")
                 }
-                transform {  }
-                load { csv("filename") {} }
+                transform { }
+                load { csv("filename.csv") {} }
             }
         }
     }

@@ -1,4 +1,4 @@
-package etl.model
+package etl.core.model
 
 /** Sources can come from multiple file types
  * this sealed interface defines these file types **/

@@ -1,4 +1,4 @@
-package etl.model
+package etl.core.model
 
 /**
  * Different types of validation rules under field block

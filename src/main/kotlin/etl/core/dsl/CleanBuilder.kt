@@ -1,7 +1,7 @@
-package etl.dsl
+package etl.core.dsl
 
-import etl.model.Clean
-import etl.model.DataCleaningOperation
+import etl.core.model.Clean
+import etl.core.model.DataCleaningOperation
 
 @EtlDslMarker
 class CleanBuilder {
@@ -21,8 +21,8 @@ class CleanBuilder {
         dataCleaningOperations.add(DataCleaningOperation.DefaultIfEmpty(field, defaultValue))
     }
 
-    fun replaceWith(field: String, value: String, replaceWith: String) {
-        dataCleaningOperations.add(DataCleaningOperation.ReplaceWith(field, value, replaceWith))
+    fun replace(field: String, value: String, replace: String) {
+        dataCleaningOperations.add(DataCleaningOperation.Replace(field, value, replace))
     }
 
     fun build(): Clean {

@@ -1,4 +1,4 @@
-package etl.dsl
+package etl.core.dsl
 
 /**
  * custom exception for DSL errors

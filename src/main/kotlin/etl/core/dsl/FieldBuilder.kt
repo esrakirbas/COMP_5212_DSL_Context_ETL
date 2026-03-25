@@ -1,6 +1,6 @@
-package etl.dsl
+package etl.core.dsl
 
-import etl.model.*
+import etl.core.model.*
 
 @EtlDslMarker
 class FieldBuilder(private val name: String) {

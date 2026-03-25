@@ -1,4 +1,4 @@
-package etl.model
+package etl.core.model
 
 /** Field definition block (under schema) **/
 data class Field(

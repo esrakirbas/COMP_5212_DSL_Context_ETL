@@ -1,5 +1,6 @@
-import etl.dsl.DslException
-import etl.dsl.etl
+
+import etl.core.dsl.DslException
+import etl.core.dsl.etl
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -26,8 +27,8 @@ class LoadDslTest {
 
     @Test
     fun `should give error if there is no csv part`() {
-        assertFailsWith<DslException> {
-            etl {
+        assertFailsWith< DslException> {
+             etl {
                 extract { csv("data.csv") }
                 schema {
                     field("fieldName") {
@@ -46,8 +47,8 @@ class LoadDslTest {
 
     @Test
     fun `should give error if there are more than one csv`() {
-        assertFailsWith<DslException> {
-            etl {
+        assertFailsWith< DslException> {
+             etl {
                 extract { csv("data.csv") }
                 schema {
                     field("fieldName") {
@@ -60,10 +61,10 @@ class LoadDslTest {
                     }
                 }
                 load {
-                    csv("filename") {
+                    csv("filename.csv") {
                         overwrite()
                     }
-                    csv("filename2") {
+                    csv("filename2.csv") {
                     }
                 }
             }
@@ -72,7 +73,7 @@ class LoadDslTest {
 
     @Test
     fun `should allow load and csv`() {
-        val job = etl {
+        val job =  etl {
             extract { csv("data.csv") }
             schema {
                 field("fieldName") {
@@ -85,19 +86,19 @@ class LoadDslTest {
                 }
             }
             load {
-                csv("filename") {
+                csv("filename.csv") {
                     //overwrite()
                 }
             }
         }
         val load = job.load
-        assertEquals("filename", load.csv.fileName)
+        assertEquals("filename.csv", load.csv.fileName)
     }
 
     @Test
     fun `should give error in case of missing filename in csv part`() {
-        assertFailsWith<DslException> {
-            etl {
+        assertFailsWith< DslException> {
+             etl {
                 extract { csv("data.csv") }
                 schema {
                     field("fieldName") {
@@ -117,8 +118,30 @@ class LoadDslTest {
     }
 
     @Test
+    fun `should give error in case of wrong file type in csv part`() {
+        assertFailsWith< DslException> {
+             etl {
+                extract { csv("data.csv") }
+                schema {
+                    field("fieldName") {
+                        notEmpty()
+                    }
+                }
+                transform {
+                    clean {
+                        trim("fieldName")
+                    }
+                }
+                load {
+                    csv("report.txt") {}
+                }
+            }
+        }
+    }
+
+    @Test
     fun `should allow overwrite in load`() {
-        val job = etl {
+        val job =  etl {
             extract { csv("data.csv") }
             schema {
                 field("fieldName") {
@@ -131,7 +154,7 @@ class LoadDslTest {
                 }
             }
             load {
-                csv("filename") {
+                csv("filename.csv") {
                     overwrite()
                 }
             }
@@ -141,7 +164,7 @@ class LoadDslTest {
 
     @Test
     fun `should allow without overwrite in load`() {
-        val job = etl {
+        val job =  etl {
             extract { csv("data.csv") }
             schema {
                 field("fieldName") {
@@ -154,7 +177,7 @@ class LoadDslTest {
                 }
             }
             load {
-                csv("filename") {
+                csv("filename.csv") {
                 }
             }
         }

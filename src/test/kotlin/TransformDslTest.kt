@@ -1,23 +1,22 @@
-import etl.dsl.DslException
-import etl.dsl.etl
-import etl.model.DataCleaningOperation
-import etl.model.DataFilteringCondition
+import  etl.core.dsl.DslException
+import  etl.core.dsl.etl
+import etl.core.model.DataCleaningOperation
+import etl.core.model.DataFilteringCondition
 import kotlin.test.*
 
 class TransformDslTest {
     @Test
-    fun `should give error if there is no transform part`() {
-        assertFailsWith<DslException> {
-             etl {
-                extract { csv("data.csv") }
-                schema {
-                    field("fieldName") {
-                        notEmpty()
-                    }
+    fun `should not give error if there is no transform part`() {
+        etl {
+            extract { csv("data.csv") }
+            schema {
+                field("fieldName") {
+                    notEmpty()
                 }
-                load { csv("filename") {} }
             }
+            load { csv("filename.csv") {} }
         }
+        assert(true) //no error till here
     }
 
     @Test
@@ -34,10 +33,10 @@ class TransformDslTest {
                     trim("fieldName")
                 }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
         val transform = job.transform
-        assertNotNull(transform.clean?.operations)
+        assertNotNull(transform!!.clean?.operations)
         assertEquals(1, transform.clean.operations.size)
     }
 
@@ -57,9 +56,9 @@ class TransformDslTest {
                     toTitleCase("brand")
                 }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        val operation = etl.transform.clean?.operations?.first()
+        val operation = etl.transform!!.clean?.operations?.first()
         assertEquals(true, operation is DataCleaningOperation.ToTitleCase)
     }
 
@@ -80,9 +79,9 @@ class TransformDslTest {
                     toLowerCase("description")
                 }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        val operation = etl.transform.clean?.operations?.first()
+        val operation = etl.transform!!.clean?.operations?.first()
         assertEquals(true, operation is DataCleaningOperation.ToLowerCase)
     }
 
@@ -103,9 +102,9 @@ class TransformDslTest {
                     defaultIfEmpty("price", "0.00")
                 }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        val operation = etl.transform.clean?.operations?.first()
+        val operation = etl.transform!!.clean?.operations?.first()
         assertEquals(true, operation is DataCleaningOperation.DefaultIfEmpty)
         if (operation is DataCleaningOperation.DefaultIfEmpty) {
             assertEquals("0.00", operation.defaultValue)
@@ -126,22 +125,22 @@ class TransformDslTest {
             }
             transform {
                 clean {
-                    replaceWith("price", "0", "0.00")
+                    replace("price", "0", "0.00")
                 }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        val operation = etl.transform.clean?.operations?.first()
-        assertEquals(true, operation is DataCleaningOperation.ReplaceWith)
-        if (operation is DataCleaningOperation.ReplaceWith) {
-            assertEquals("0.00", operation.replaceWith)
+        val operation = etl.transform!!.clean?.operations?.first()
+        assertEquals(true, operation is DataCleaningOperation.Replace)
+        if (operation is DataCleaningOperation.Replace) {
+            assertEquals("0.00", operation.replace)
         }
     }
 
     @Test
     fun `should give error if there are duplicate clean parts`() {
         assertFailsWith<DslException> {
-             etl {
+            etl {
                 extract { csv("data.csv") }
                 schema {
                     field("fieldName") {
@@ -152,14 +151,14 @@ class TransformDslTest {
                     clean { trim("fieldName") }
                     clean { toTitleCase("fieldName") }
                 }
-                load { csv("filename") {} }
+                load { csv("filename.csv") {} }
             }
         }
     }
 
     @Test
     fun `should allow filter in transform`() {
-         etl {
+        etl {
             extract { csv("data.csv") }
             schema {
                 field("fieldName") {
@@ -172,7 +171,7 @@ class TransformDslTest {
                 }
                 filter { }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
         assertTrue { true }
     }
@@ -180,7 +179,7 @@ class TransformDslTest {
     @Test
     fun `should give error if there are duplicate filter parts`() {
         assertFailsWith<DslException> {
-             etl {
+            etl {
                 extract { csv("data.csv") }
                 schema {
                     field("fieldName") {
@@ -191,7 +190,7 @@ class TransformDslTest {
                     filter { }
                     filter { }
                 }
-                load { csv("filename") {} }
+                load { csv("filename.csv") {} }
             }
         }
     }
@@ -208,9 +207,9 @@ class TransformDslTest {
             transform {
                 filter { equals("city", "Thunder Bay") }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        assertEquals(1, job.transform.filter?.conditions?.size)
+        assertEquals(1, job.transform!!.filter?.conditions?.size)
         val equalsCond = job.transform.filter?.conditions?.first()
         if (equalsCond is DataFilteringCondition.Equals) {
             assertEquals("Thunder Bay", equalsCond.value)
@@ -231,9 +230,9 @@ class TransformDslTest {
             transform {
                 filter { notEquals("city", "Vancouver") }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        assertEquals(1, job.transform.filter?.conditions?.size)
+        assertEquals(1, job.transform!!.filter?.conditions?.size)
         val notEqualsCond = job.transform.filter?.conditions?.first()
         if (notEqualsCond is DataFilteringCondition.NotEquals) {
             assertEquals("Vancouver", notEqualsCond.value)
@@ -254,9 +253,9 @@ class TransformDslTest {
             transform {
                 filter { empty("city") }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        assertEquals(1, job.transform.filter?.conditions?.size)
+        assertEquals(1, job.transform!!.filter?.conditions?.size)
         val emptyCond = job.transform.filter?.conditions?.first()
         if (emptyCond is DataFilteringCondition.Empty) {
             assertEquals("city", emptyCond.field)
@@ -277,9 +276,9 @@ class TransformDslTest {
             transform {
                 filter { notEmpty("city") }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        assertEquals(1, job.transform.filter?.conditions?.size)
+        assertEquals(1, job.transform!!.filter?.conditions?.size)
         val notEmptyCond = job.transform.filter?.conditions?.first()
         if (notEmptyCond is DataFilteringCondition.NotEmpty) {
             assertEquals("city", notEmptyCond.field)
@@ -300,9 +299,9 @@ class TransformDslTest {
             transform {
                 filter { greaterThan("last_update_date", "20260101") }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        assertEquals(1, job.transform.filter?.conditions?.size)
+        assertEquals(1, job.transform!!.filter?.conditions?.size)
         val greaterThanCond = job.transform.filter?.conditions?.first()
         if (greaterThanCond is DataFilteringCondition.GreaterThan) {
             assertEquals("20260101", greaterThanCond.value)
@@ -323,9 +322,9 @@ class TransformDslTest {
             transform {
                 filter { lessThan("last_update_date", "20260101") }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        assertEquals(1, job.transform.filter?.conditions?.size)
+        assertEquals(1, job.transform!!.filter?.conditions?.size)
         val lessThanCond = job.transform.filter?.conditions?.first()
         if (lessThanCond is DataFilteringCondition.LessThan) {
             assertEquals("20260101", lessThanCond.value)
@@ -346,9 +345,9 @@ class TransformDslTest {
             transform {
                 filter { contains("address_line", "Oliver") }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        assertEquals(1, job.transform.filter?.conditions?.size)
+        assertEquals(1, job.transform!!.filter?.conditions?.size)
         val containsCond = job.transform.filter?.conditions?.first()
         if (containsCond is DataFilteringCondition.Contains) {
             assertEquals("address_line", containsCond.field)
@@ -373,8 +372,8 @@ class TransformDslTest {
                     contains("address_line", "Oliver")
                 }
             }
-            load { csv("filename") {} }
+            load { csv("filename.csv") {} }
         }
-        assertEquals(2, job.transform.filter?.conditions?.size)
+        assertEquals(2, job.transform!!.filter?.conditions?.size)
     }
 }

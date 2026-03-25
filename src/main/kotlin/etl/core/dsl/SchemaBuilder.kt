@@ -1,7 +1,7 @@
-package etl.dsl
+package etl.core.dsl
 
-import etl.model.Field
-import etl.model.Schema
+import etl.core.model.Field
+import etl.core.model.Schema
 
 @EtlDslMarker
 class SchemaBuilder {
@@ -11,9 +11,7 @@ class SchemaBuilder {
         if(fields.any { it.name == name }) {
             throw DslException("Field $name is already defined in schema.")
         }
-        val builder = FieldBuilder(name)
-        builder.block()
-        fields.add(builder.build())
+        fields += FieldBuilder(name).apply(block).build()
     }
 
     fun build(): Schema {

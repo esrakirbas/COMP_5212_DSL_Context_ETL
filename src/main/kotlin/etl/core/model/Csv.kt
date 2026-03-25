@@ -1,4 +1,4 @@
-package etl.model
+package etl.core.model
 
 /** Csv definition block (under schema) **/
 data class Csv(

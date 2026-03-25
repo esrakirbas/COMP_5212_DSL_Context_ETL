@@ -1,7 +1,7 @@
-package etl.dsl
+package etl.core.dsl
 
-import etl.model.DataFilteringCondition
-import etl.model.Filter
+import etl.core.model.DataFilteringCondition
+import etl.core.model.Filter
 
 class FilterBuilder {
     val dataFilteringConditions = mutableListOf<DataFilteringCondition>()

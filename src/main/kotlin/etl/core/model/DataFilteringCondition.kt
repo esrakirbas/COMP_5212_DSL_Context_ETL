@@ -1,4 +1,4 @@
-package etl.model
+package etl.core.model
 
 /**
  * Different types of data filtering conditions under filter block

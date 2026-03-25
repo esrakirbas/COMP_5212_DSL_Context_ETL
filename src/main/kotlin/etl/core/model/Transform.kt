@@ -1,4 +1,4 @@
-package etl.model
+package etl.core.model
 
 data class Transform(
     val clean: Clean?,
