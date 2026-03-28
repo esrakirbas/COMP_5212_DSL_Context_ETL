@@ -1,27 +1,37 @@
 package etl.core.engine
 
 import etl.core.model.EtlJob
+import etl.util.Logger
+import java.io.File
 
 class EtlRunner {
 
-    fun run(job: EtlJob) {
-        val logger: ((String) -> Unit)? = job.log?.let { logConfig ->
-            { message: String ->
-                println(message) // temporary behavior
-                // later → we will write to log file using logConfig.path
-            }
-        }
-        val extractedData = ExtractEngine.extract(job.extract)
-        logger?.invoke("Extracted rows: ${extractedData.size}")
 
-        val validationResult = SchemaEngine.validate(extractedData, job.schema, logger)
-        // validationResult logging
-        logger?.invoke("Accepted record found: ${validationResult.acceptedRecords.size}")
-        logger?.invoke("Invalid record count: ${validationResult.invalidCount}")
-        logger?.invoke("Rejected record found: ${validationResult.rejectedCount}")
-        logger?.invoke("Error totals by field:")
-        validationResult.fieldErrors.forEach { (field, count) ->
-            logger?.invoke("Field: $field → $count errors")
+    fun run(job: EtlJob) {
+        //set logger
+        val logger = Logger.forClass(EtlRunner::class)
+        if (job.log != null && job.log.fileAbsolutePath.isNotEmpty()) {
+            Logger.logFile = File(job.log.fileAbsolutePath)
         }
+
+        //start pipeline
+        val extractedData = ExtractEngine.extract(job.extract)
+        val validationResult = SchemaEngine.validate(extractedData, job.schema)
+        logger.info("Accepted record found: ${validationResult.acceptedRecords.size}")
+        logger.info("Invalid record count: ${validationResult.invalidCount}")
+        logger.info("Rejected record found: ${validationResult.rejectedCount}")
+        logger.info("Error totals by field:")
+        validationResult.fieldErrors.forEach { (field, count) ->
+            logger.info("Field: $field → $count errors")
+        }
+
+        val transformedData = TransformEngine.transform(validationResult.acceptedRecords, job.transform)
+        logger.info("Transformed rows: ${transformedData.size}")
+        if (transformedData.isEmpty()) {
+            logger.warn(" No records to load. Skipping load step.")
+            return
+        }
+
+        LoadEngine.load(transformedData, job.load)
     }
 }

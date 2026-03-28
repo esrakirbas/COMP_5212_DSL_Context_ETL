@@ -1,15 +1,19 @@
 package etl.core.engine
 
 import etl.core.model.*
+import etl.util.Logger
 
 object SchemaEngine {
-    fun validate(records: List<Record>, schema: Schema, logger: ((String) -> Unit)? = null): ValidationResult {
+
+    private val logger = Logger.forClass(SchemaEngine::class)
+
+    fun validate(records: List<Record>, schema: Schema): ValidationResult {
         val fieldErrors = mutableMapOf<String, Int>()
         var invalidCount = 0
         var rejectedCount = 0
         val validRecords = mutableListOf<Record>()
         for (record in records) {
-            val validationResult = validateRecord(record, schema, logger, fieldErrors)
+            val validationResult = validateRecord(record, schema, fieldErrors)
             when (validationResult) {
                 RecordStatus.VALID -> {
                     validRecords += record
@@ -32,7 +36,6 @@ object SchemaEngine {
     private fun validateRecord(
         record: Record,
         schema: Schema,
-        logger: ((String) -> Unit)?,
         fieldErrors: MutableMap<String, Int>
     ): RecordStatus {
         var hasValidationError = false
@@ -44,7 +47,7 @@ object SchemaEngine {
                     val valid = applyRule(value, rule)
                     if (!valid) {
                         hasValidationError = true
-                        logger?.invoke("Invalid value for field ${field.name}: ${if (value.isNullOrEmpty()) "EMPTY" else value}")
+                        logger.error("Invalid value for field ${field.name}: ${if (value.isNullOrEmpty()) "EMPTY" else value}")
                         fieldErrors[field.name] =
                             fieldErrors.getOrDefault(field.name, 0) + 1
                     }

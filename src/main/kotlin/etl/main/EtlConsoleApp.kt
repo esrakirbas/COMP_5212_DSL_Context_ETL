@@ -6,24 +6,28 @@ import etl.core.engine.EtlRunner
 fun main() {
     val job = etl {
         log("etl.log")
-
-        extract {
-            csv("people.csv")
-        }
-
+        extract { csv("customers.csv") }
         schema {
-            field("name") {
+            field("city") {
                 notEmpty()
-            }
-            field(name = "city") {
-                notEmpty()
-                rejectIfInvalid()
+                maxLength(15)
+                minLength(3)
             }
         }
+        transform {
+            clean {
+                trim("name")
+                toLowerCase("email")
+                defaultIfEmpty("city", "Unknown")
+                replace("city", "NYC", "New York")
+                toTitleCase("city")
+            }
 
-        load {
-            csv("output.csv") {}
+            filter {
+                equals("city", "Thunderbay")
+            }
         }
+        load { csv("filename.csv") {overwrite()} }
     }
 
     EtlRunner().run(job)
