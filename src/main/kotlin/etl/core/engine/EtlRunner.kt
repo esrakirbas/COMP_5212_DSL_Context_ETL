@@ -1,6 +1,7 @@
 package etl.core.engine
 
 import etl.core.model.EtlJob
+import etl.core.model.InvalidPolicy
 import etl.util.Logger
 import java.io.File
 
@@ -17,15 +18,18 @@ class EtlRunner {
         //start pipeline
         val extractedData = ExtractEngine.extract(job.extract)
         val validationResult = SchemaEngine.validate(extractedData, job.schema)
-        logger.info("Accepted record found: ${validationResult.acceptedRecords.size}")
-        logger.info("Invalid record count: ${validationResult.invalidCount}")
-        logger.info("Rejected record found: ${validationResult.rejectedCount}")
-        logger.info("Error totals by field:")
-        validationResult.fieldErrors.forEach { (field, count) ->
-            logger.info("Field: $field → $count errors")
-        }
+        logger.info("Valid records : ${validationResult.validRecords.size}")
+        logger.info("Invalid records: ${validationResult.invalidRecords.size}")
+        validationResult.errors.forEach { e -> logger.error("Validation Error : Row ${e.rowIndex} → ${e.field}: ${e.message}") }
 
-        val transformedData = TransformEngine.transform(validationResult.acceptedRecords, job.transform)
+        val recordsToProcess = when (job.invalidPolicy) {
+            InvalidPolicy.REJECT -> validationResult.validRecords
+            InvalidPolicy.KEEP -> validationResult.validRecords + validationResult.invalidRecords
+        }
+        logger.info("Invalid policy: ${job.invalidPolicy}")
+        logger.info("Records passed to transform: ${recordsToProcess.size}")
+
+        val transformedData = TransformEngine.transform(recordsToProcess, job.transform)
         logger.info("Transformed rows: ${transformedData.size}")
         if (transformedData.isEmpty()) {
             logger.warn(" No records to load. Skipping load step.")

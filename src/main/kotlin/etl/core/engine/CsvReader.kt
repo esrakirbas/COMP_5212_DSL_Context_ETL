@@ -19,11 +19,11 @@ object CsvReader {
                 .use { parser -> //guarantees to close the resources
                     val headers = parser.headerMap.keys
                     return parser.map { csvRecord ->
-                        headers.associateWith { header -> csvRecord.get(header) }.toMutableMap()
+                        val record = headers.associateWith { header -> csvRecord.get(header) }.toMutableMap()
+                        record["_source"] = path
+                        record
                     }
                 }
-
         }
-
     }
 }

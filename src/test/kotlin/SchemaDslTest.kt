@@ -30,7 +30,6 @@ class SchemaDslTest {
                 field("fieldName") {
                     notEmpty()
                     isNumber()
-                    rejectIfInvalid()
                 }
             }
             transform { }

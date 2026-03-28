@@ -21,7 +21,6 @@ class SchemaEngineTest {
                     notEmpty()
                     maxLength(15)
                     minLength(3)
-                    rejectIfInvalid()
                 }
             }
             transform { }
@@ -29,7 +28,7 @@ class SchemaEngineTest {
         }
 
         val result = SchemaEngine.validate(records, etl.schema)
-        assertEquals(1, result.acceptedRecords.size)
+        assertEquals(1, result.validRecords.size)
     }
 
     @Test
@@ -60,6 +59,6 @@ class SchemaEngineTest {
         }
 
         val result = SchemaEngine.validate(records, etl.schema)
-        assertEquals(2, result.acceptedRecords.size)
+        assertEquals(2, result.validRecords.size)
     }
 }

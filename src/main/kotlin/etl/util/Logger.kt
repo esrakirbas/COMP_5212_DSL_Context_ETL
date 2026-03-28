@@ -18,15 +18,14 @@ class Logger private constructor(private val name: String) {
     }
 
     private fun log(message: String) {
-        val fullMessage = "[${timestamp()}] [$name] $message"
-        println(fullMessage) // console
-        logFile?.appendText(fullMessage + "\n") // file
+        println(message) // console
+        logFile?.appendText(message + "\n") // file
     }
 
     companion object {
         private val cache = mutableMapOf<String, Logger>()
 
-        // 👇 file is optional (can be turned on/off)
+        //file is optional (can be turned on/off)
         var logFile: java.io.File? = null
 
         fun forClass(clazz: KClass<*>): Logger {

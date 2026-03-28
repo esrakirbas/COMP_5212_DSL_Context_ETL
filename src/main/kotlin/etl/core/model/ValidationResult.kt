@@ -1,8 +1,7 @@
 package etl.core.model
 
 data class ValidationResult (
-    val acceptedRecords: List<Record>,
-    val invalidCount: Int,
-    val rejectedCount: Int,
-    val fieldErrors: Map<String, Int>
+    val validRecords: List<Record>,
+    val invalidRecords: List<Record>,
+    val errors: List<RecordError>
 )

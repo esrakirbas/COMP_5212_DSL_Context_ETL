@@ -10,12 +10,16 @@ class FieldBuilder(private val name: String) {
         validationRules.add(NotEmpty)
     }
 
-    fun rejectIfInvalid() {
-        validationRules.add(RejectIfInvalid)
-    }
-
     fun isNumber() {
         validationRules.add(IsNumber)
+    }
+
+    fun min(value: Int) {
+        validationRules.add(Min(value))
+    }
+
+    fun max(value: Int) {
+        validationRules.add(Max(value))
     }
 
     fun minLength(length: Int) {

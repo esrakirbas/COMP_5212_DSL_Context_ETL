@@ -6,28 +6,87 @@ import etl.core.engine.EtlRunner
 fun main() {
     val job = etl {
         log("etl.log")
-        extract { csv("customers.csv") }
+
+        extract {
+            csv("flights_small_CA.csv")
+            csv("flights_20260328_CA.csv")
+            json("flights_small_WS.json")
+        }
+
         schema {
-            field("city") {
+            field("flight_id") {
                 notEmpty()
-                maxLength(15)
+            }
+
+            field("origin") {
+                notEmpty()
                 minLength(3)
+                maxLength(3)
+            }
+
+            field("destination") {
+                notEmpty()
+                minLength(3)
+                maxLength(3)
+            }
+
+            field("departure_hour") {
+                min(0)
+                max(23)
+            }
+
+            field("departure_minute") {
+                min(0)
+                max(59)
+            }
+
+            field("arrival_hour") {
+                min(0)
+                max(23)
+            }
+
+            field("arrival_minute") {
+                min(0)
+                max(59)
+            }
+
+            field("delay_minutes") {
+                min(0)
+            }
+
+            field("status") {
+                notEmpty()
+            }
+
+            field("passenger_count") {
+                min(0)
+            }
+
+            field("load_factor") {
+                min(0)
+                max(100)
             }
         }
+
+        invalidPolicy("reject")
+
         transform {
             clean {
-                trim("name")
-                toLowerCase("email")
-                defaultIfEmpty("city", "Unknown")
-                replace("city", "NYC", "New York")
-                toTitleCase("city")
+                trim("origin")
+                trim("destination")
+                //toUpperCase("status")
             }
 
             filter {
-                equals("city", "Thunderbay")
+                notEquals("status", "CANCELLED")
             }
         }
-        load { csv("filename.csv") {overwrite()} }
+
+        load {
+            csv("output.csv") {
+                overwrite()
+            }
+        }
     }
 
     EtlRunner().run(job)
