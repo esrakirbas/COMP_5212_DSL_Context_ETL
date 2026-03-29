@@ -2,6 +2,7 @@
 
 This project implements a Domain-Specific Language (DSL) for defining ETL (Extract, Transform, Load) workflows in a declarative way.
 The execution engine is built using functional programming principles in Kotlin.
+The project is implemented in Kotlin targeting JVM 17.
 
 ---
 
@@ -18,12 +19,12 @@ The execution engine is built using functional programming principles in Kotlin.
 
 ## How to Run
 
-The project is self-contained and requires no additional configuration beyond a standard Maven setup.
+This is a standard Maven project and does not require an additional setup.
 
-1. Open the project in IntelliJ IDEA (or any Kotlin-compatible IDE)
-2. Ensure JDK 17 is configured
+1. Open the project in IntelliJ IDEA 
+2. Ensure JDK 17 is configured as the target JVM
 3. Import as a Maven project
-4. Run the main function
+4. Run the main function in etl.main.EtlConsoleApp.tk
 
 The application will automatically process the sample input files located in the `sample-data` folder and generate an output CSV file in the project root directory.
 
@@ -82,6 +83,7 @@ pom.xml             → Maven configuration
 ## Notes
 
 * All data is processed as strings for simplicity and consistency across different file formats
+* Allowed data formats : .csv, .json (flattened), xlsx
 * Validation and transformation rules are applied during the pipeline execution
 * The DSL allows users to define workflows without dealing with low-level implementation details
 
