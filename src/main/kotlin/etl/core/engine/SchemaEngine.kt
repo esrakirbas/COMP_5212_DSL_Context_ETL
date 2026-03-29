@@ -72,4 +72,14 @@ object SchemaEngine {
             }
         }
     }
+
+    fun project(records: List<Record>, schema: Schema): List<Record> {
+        val allowedFields = schema.fields.map { it.name }.toSet()
+
+        return records.map { record ->
+            record
+                .filterKeys { it in allowedFields || it.startsWith("_") }
+                .toMutableMap()
+        }
+    }
 }

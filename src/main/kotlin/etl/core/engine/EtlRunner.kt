@@ -15,8 +15,10 @@ class EtlRunner {
 
         //start pipeline
         val extractedData = ExtractEngine.extract(job.extract)
-        logger.info("Records passed to validation(SchemaEngine): ${extractedData.size}")
-        val validationResult = SchemaEngine.validate(extractedData, job.schema)
+        logger.info("Records passed to projection(SchemaEngine): ${extractedData.size}")
+        val projectedData = SchemaEngine.project(extractedData, job.schema)
+        logger.info("Records passed to validation(SchemaEngine): ${projectedData.size}")
+        val validationResult = SchemaEngine.validate(projectedData, job.schema)
         logger.info("Valid records : ${validationResult.validRecords.size}")
         logger.info("Invalid records: ${validationResult.invalidRecords.size}")
         validationResult.errors.forEach { e -> logger.error("Validation Error : ${e.field}: ${e.message}") }
