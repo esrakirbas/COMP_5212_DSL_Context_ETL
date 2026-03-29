@@ -1,9 +1,6 @@
 package etl.core.engine
 
-import etl.core.model.CsvSource
-import etl.core.model.Extract
-import etl.core.model.JsonSource
-import etl.core.model.Record
+import etl.core.model.*
 import etl.util.Logger
 
 object ExtractEngine {
@@ -18,13 +15,18 @@ object ExtractEngine {
                     logger.info("Extracted ${records.size} records from ${source.path}")
                     records
                 }
+
                 is JsonSource -> {
                     val records = JsonReader.readJson(source.path)
                     logger.info("Extracted ${records.size} records from ${source.path}")
                     records
                 }
-                else -> emptyList() //TODO change later
-                //is ExcelSource -> readExcel(source.path)
+
+                is ExcelSource -> {
+                    val records = ExcelReader.readExcel(source.path)
+                    logger.info("Extracted ${records.size} records from ${source.path}")
+                    records
+                }
             }
         }
     }

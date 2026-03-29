@@ -10,8 +10,8 @@ object SchemaEngine {
         val errors = mutableListOf<RecordError>()
         val validRecords = mutableListOf<Record>()
         val invalidRecords = mutableListOf<Record>()
-        records.forEachIndexed { rowIndex, record ->
-            val validationResult = validateRecord(record, rowIndex, schema)
+        records.forEach { record ->
+            val validationResult = validateRecord(record, schema)
             when (validationResult.first) {
                 RecordStatus.VALID -> {
                     validRecords += record
@@ -28,7 +28,6 @@ object SchemaEngine {
 
     private fun validateRecord(
         record: Record,
-        rowIndex: Int,
         schema: Schema
     ): Pair<RecordStatus, List<RecordError>> {
         var hasValidationError = false
@@ -41,10 +40,9 @@ object SchemaEngine {
                     hasValidationError = true
                     recordErrors.add(
                         RecordError(
-                            rowIndex = rowIndex,
                             field = field.name,
                             message = "Invalid value for field ${field.name}: ${if (value.isNullOrEmpty()) "EMPTY" else value} " +
-                                    "rule: $rule (source : ${record["_source"]})"
+                                    "rule: $rule (source : ${record["_source"]} , record : ${record["_recIndex"]})"
                         )
                     )
                 }

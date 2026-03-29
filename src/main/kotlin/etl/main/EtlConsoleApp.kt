@@ -4,13 +4,14 @@ import etl.core.dsl.etl
 import etl.core.engine.EtlRunner
 
 fun main() {
+    val basePath = "sample-data/"
     val job = etl {
         log("etl.log")
 
         extract {
-            csv("flights_small_CA.csv")
-            csv("flights_20260328_CA.csv")
-            json("flights_small_WS.json")
+            csv("${basePath}flights_20260328_CA.csv")
+            json("${basePath}flights_20260328_WS.json")
+            excel("${basePath}flights_20260328_PD.xlsx")
         }
 
         schema {
@@ -74,7 +75,6 @@ fun main() {
             clean {
                 trim("origin")
                 trim("destination")
-                //toUpperCase("status")
             }
 
             filter {

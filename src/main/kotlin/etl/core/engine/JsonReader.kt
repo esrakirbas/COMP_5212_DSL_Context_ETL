@@ -25,7 +25,7 @@ object JsonReader {
 
         logger.info("JSON File Opened: $path Extracting JSON Records.")
 
-        val records = data.map { map ->
+        val records = data.mapIndexed { index, map ->
             val record = mutableMapOf<String, String>()
 
             for ((key, value) in map) {
@@ -33,6 +33,7 @@ object JsonReader {
             }
 
             record["_source"] = path
+            record["_recIndex"] = (index+1).toString()
             record
         }
 

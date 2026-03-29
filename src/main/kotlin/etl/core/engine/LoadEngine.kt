@@ -4,6 +4,7 @@ import etl.core.model.Load
 import etl.core.model.Record
 import etl.util.Logger
 import java.io.File
+import etl.core.model.Csv
 
 object LoadEngine {
 
@@ -11,6 +12,17 @@ object LoadEngine {
 
     fun load(records: List<Record>, load: Load) {
         writeCsv(records, load)
+    }
+
+    fun load(records: List<Record>, rejectedOutputPath: String) {
+        val tempLoad = Load(
+            csv = Csv(
+                fileName = rejectedOutputPath,
+                overwrite = true //rejected file
+            )
+        )
+
+        writeCsv(records, tempLoad)
     }
 
     private fun writeCsv(records: List<Record>, load: Load) {

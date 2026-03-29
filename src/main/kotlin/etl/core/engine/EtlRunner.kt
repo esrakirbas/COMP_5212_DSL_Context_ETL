@@ -6,8 +6,6 @@ import etl.util.Logger
 import java.io.File
 
 class EtlRunner {
-
-
     fun run(job: EtlJob) {
         //set logger
         val logger = Logger.forClass(EtlRunner::class)
@@ -17,10 +15,11 @@ class EtlRunner {
 
         //start pipeline
         val extractedData = ExtractEngine.extract(job.extract)
+        logger.info("Records passed to validation(SchemaEngine): ${extractedData.size}")
         val validationResult = SchemaEngine.validate(extractedData, job.schema)
         logger.info("Valid records : ${validationResult.validRecords.size}")
         logger.info("Invalid records: ${validationResult.invalidRecords.size}")
-        validationResult.errors.forEach { e -> logger.error("Validation Error : Row ${e.rowIndex} → ${e.field}: ${e.message}") }
+        validationResult.errors.forEach { e -> logger.error("Validation Error : ${e.field}: ${e.message}") }
 
         val recordsToProcess = when (job.invalidPolicy) {
             InvalidPolicy.REJECT -> validationResult.validRecords
@@ -35,7 +34,14 @@ class EtlRunner {
             logger.warn(" No records to load. Skipping load step.")
             return
         }
-
+        //load data to target CSV file
         LoadEngine.load(transformedData, job.load)
+
+        //if there are rejected records, load them to a separate file to make them observable
+        if (job.invalidPolicy == InvalidPolicy.REJECT && validationResult.invalidRecords.isNotEmpty()) {
+            val rejectedPath = job.load.csv.fileName.replace(".csv", "_rejected.csv")
+            logger.info("Writing rejected records to: $rejectedPath")
+            LoadEngine.load(validationResult.invalidRecords, rejectedPath)
+        }
     }
 }
